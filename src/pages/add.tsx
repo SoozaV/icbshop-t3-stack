@@ -68,12 +68,16 @@ export default function AddProduct() {
 
   return (
     <Layout>
-      <form onSubmit={(e) => addProduct({ e, productData })}>
+      <form
+        className="container mx-auto flex max-w-2xl flex-col"
+        onSubmit={(e) => addProduct({ e, productData })}
+      >
         <input
           onChange={(e) =>
             setProductData({ ...productData, title: e.target.value })
           }
           type="text"
+          className="mb-2 rounded border-2 p-3 outline-none"
           value={productData.title}
           placeholder="Título del producto"
         />
@@ -83,45 +87,71 @@ export default function AddProduct() {
           }
           value={productData.description}
           placeholder="Descripción del producto"
+          className="mb-2 rounded border-2 p-3 outline-none"
         />
-        <div>
-          <input
-            onChange={(e) =>
-              setProductData({
-                ...productData,
-                price: parseFloat(e.target.value),
-              })
-            }
-            type="text"
-            value={productData.price}
-            placeholder="Precio del producto"
-          />
-          <input
-            onChange={(e) =>
-              setProductData({
-                ...productData,
-                stock: parseInt(e.target.value),
-              })
-            }
-            type="text"
-            value={productData.stock}
-            placeholder="Stock del producto"
-          />
+        <div className="flex">
+          <div className="flex w-2/4 flex-col mr-1">
+            <label htmlFor="price"> Precio del producto:</label>
+            <input
+              id="price"
+              onChange={(e) => {
+                if (isNaN(parseInt(e.target.value))) e.target.value = "0";
+                setProductData({
+                  ...productData,
+                  price: parseFloat(e.target.value),
+                });
+              }}
+              type="text"
+              value={productData.price}
+              className="mb-2 w-full rounded border-2 p-3 outline-none"
+            />
+          </div>
+          <div className="flex w-2/4 flex-col ml-1">
+            <label htmlFor="stock"> Stock:</label>
+            <input
+              id="stock"
+              onChange={(e) => {
+                if (isNaN(parseInt(e.target.value))) e.target.value = "0";
+                setProductData({
+                  ...productData,
+                  stock: parseInt(e.target.value),
+                });
+              }}
+              type="text"
+              value={productData.stock}
+              placeholder="Stock del producto"
+              className="mb-2 w-full rounded border-2 p-3 outline-none"
+            />
+          </div>
         </div>
-        <label
-          htmlFor="file-upload"
-          className="text-grey-500 rounded-full
-            border-0 bg-blue-50
-            py-2 px-6
-            text-sm
+        <div className="flex">
+          <label
+            htmlFor="file-upload"
+            className="text-grey-500 rounded
+          border-2 w-2/4
+            border-solid bg-blue-50
+            py-2 text-center mr-1
+            px-6 text-sm
             font-medium text-blue-700
             hover:cursor-pointer hover:bg-amber-50
             hover:text-amber-700"
-        >
-          Seleccionar Imagen
-        </label>
-        <input type="submit" value="Añadir Producto" />
-        {imageSrc && <img src={imageSrc.toString()} alt="" />}
+          >
+            Seleccionar Imagen
+          </label>
+          <input
+            type="submit"
+            value="Añadir Producto"
+            className="text-grey-500 rounded
+          border-2
+            border-solid bg-blue-50
+            py-2 w-2/4 ml-1
+            px-6 text-sm
+            font-medium text-blue-700
+            hover:cursor-pointer hover:bg-amber-50
+            hover:text-amber-700"
+          />
+        </div>
+        <div className="flex justify-center p-5">{imageSrc && <img className="max-w-xs rounded" src={imageSrc.toString()} alt="" />}</div>
         <input
           onChange={(e) => handleOnChange(e)}
           className="absolute -left-[9999rem]"

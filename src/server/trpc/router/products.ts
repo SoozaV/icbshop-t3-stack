@@ -1,3 +1,4 @@
+import { Product } from "@prisma/client";
 import { z } from "zod";
 
 import { router, publicProcedure } from "../trpc";
@@ -23,7 +24,6 @@ export const productRouter = router({
         stock: z.number(),
         price: z.number(),
         imgUrl: z.string(),
-        formData: z.any(), // ? Colocar el tipo de un FormData
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -36,6 +36,16 @@ export const productRouter = router({
           .replace(/[^\w\s-]/g, "")
           .replace(/[\s_-]+/g, "-")
           .replace(/^-+|-+$/g, "");
+
+      const slug = await ctx.prisma.product
+        .findUnique({
+          where: {
+            slug: slugify(input.title),
+          },
+        })
+        .then((res) => res?.slug);
+
+      console.log("Slug: ", slug);
 
       return ctx.prisma.product.create({
         data: {
