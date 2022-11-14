@@ -24,6 +24,9 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
               Inicio
             </Link>
             <div>
+              <Link href="/add" className="px-5">
+                Añadir Producto
+              </Link>
               <Link href="/cart" className="px-5">
                 Carrito
               </Link>
