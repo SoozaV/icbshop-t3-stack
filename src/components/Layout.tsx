@@ -2,7 +2,12 @@ import Head from "next/head";
 import Link from "next/link";
 import React from "react";
 
-function Layout({ title, children }: { title?: string; children: any }) {
+type LayoutProps = {
+  title?: string;
+  children: any;
+};
+
+const Layout: React.FC<LayoutProps> = ({ title, children }) => {
   const icb = "Ingeniería Científica Bionanomolecular SA de CV";
 
   return (
@@ -32,6 +37,6 @@ function Layout({ title, children }: { title?: string; children: any }) {
       </div>
     </>
   );
-}
+};
 
 export default Layout;
