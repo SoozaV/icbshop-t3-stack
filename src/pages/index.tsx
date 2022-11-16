@@ -1,12 +1,10 @@
 import { type NextPage } from "next";
-import Link from "next/link";
 import Layout from "../components/Layout";
 import ProductItem from "../components/ProductItem";
 
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
-  // const hello = trpc.example.hello.useQuery({ text: "from tRPC" });
   const products = trpc.product.getAllProducts.useQuery();
 
   return (

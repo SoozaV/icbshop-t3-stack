@@ -12,4 +12,6 @@ const t = initTRPC.context<Context>().create({
 
 export const router = t.router;
 
+export const trpcMiddleware = t.middleware;
+
 export const publicProcedure = t.procedure;

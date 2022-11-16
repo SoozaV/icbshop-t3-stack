@@ -7,12 +7,11 @@ type ProductData = {
   description: string;
   stock: number;
   price: number;
-  imgUrl: string;
+  imgUrl: any;
 };
 
 export default function AddProduct() {
   const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
-  const [imageFormData, setImageFormData] = useState<any>(); // ? Colocar el tipo de un FormData
   const [productData, setProductData] = useState<ProductData>({
     title: "",
     description: "",
@@ -28,7 +27,8 @@ export default function AddProduct() {
     // Generando vista previa de la imagen
     const reader = new FileReader();
     reader.onload = (onLoadEvent) =>
-      onLoadEvent.target ? setImageSrc(onLoadEvent.target.result) : null;
+      onLoadEvent.target ? setImageSrc(onLoadEvent?.target?.result) : null;
+
     const inputElement = changeEvent.target as HTMLFormElement;
     if (changeEvent.target) reader.readAsDataURL(inputElement.files[0]);
 
@@ -39,30 +39,18 @@ export default function AddProduct() {
     formData.append("file", form.files[0]);
     formData.append("upload_preset", "icb-shop");
 
-    setImageFormData(formData);
+    setProductData({
+      ...productData,
+      imgUrl: formData,
+    });
   };
 
-  const addProduct = async ({
-    e,
-    productData,
-  }: {
-    e: FormEvent;
-    productData: ProductData;
-  }) => {
+  const addProduct = ({ e, productData, }: { e: FormEvent; productData: ProductData; }) => {
     e.preventDefault();
-    // Intenté subir la imagen desde back dentro del método mutation pero siempre me daba error 400 Bad Request
-    // tuve que hacer la subida aquí en lo que averiguo cómo se hace
-    const imageResponse = await fetch(
-      "https://api.cloudinary.com/v1_1/dnovht5lf/image/upload",
-      {
-        method: "POST",
-        body: imageFormData,
-      }
-    ).then((res) => res.json());
-
-    productEndpoint.mutateAsync({
+    console.log("FormData BEFORE sending: ", productData);
+    console.log("Testing FormData: ", productData.imgUrl.get("file"));
+    productEndpoint.mutate({
       ...productData,
-      imgUrl: imageResponse.url,
     });
   };
 
@@ -90,23 +78,26 @@ export default function AddProduct() {
           className="mb-2 rounded border-2 p-3 outline-none"
         />
         <div className="flex">
-          <div className="flex w-2/4 flex-col mr-1">
+          <div className="mr-1 flex w-2/4 flex-col">
             <label htmlFor="price"> Precio del producto:</label>
             <input
               id="price"
               onChange={(e) => {
-                if (isNaN(parseInt(e.target.value))) e.target.value = "0";
+                const price = parseFloat(
+                  Number(e.target.value.replace(/^0+/, "")).toFixed(2)
+                );
+                e.target.value = price.toString();
                 setProductData({
                   ...productData,
-                  price: parseFloat(e.target.value),
+                  price,
                 });
               }}
-              type="text"
+              type="number"
               value={productData.price}
               className="mb-2 w-full rounded border-2 p-3 outline-none"
             />
           </div>
-          <div className="flex w-2/4 flex-col ml-1">
+          <div className="ml-1 flex w-2/4 flex-col">
             <label htmlFor="stock"> Stock:</label>
             <input
               id="stock"
@@ -127,11 +118,11 @@ export default function AddProduct() {
         <div className="flex">
           <label
             htmlFor="file-upload"
-            className="text-grey-500 rounded
-          border-2 w-2/4
-            border-solid bg-blue-50
-            py-2 text-center mr-1
-            px-6 text-sm
+            className="text-grey-500 mr-1
+          w-2/4 rounded
+            border-2 border-solid
+            bg-blue-50 py-2 px-6
+            text-center text-sm
             font-medium text-blue-700
             hover:cursor-pointer hover:bg-amber-50
             hover:text-amber-700"
@@ -141,17 +132,25 @@ export default function AddProduct() {
           <input
             type="submit"
             value="Añadir Producto"
-            className="text-grey-500 rounded
-          border-2
-            border-solid bg-blue-50
-            py-2 w-2/4 ml-1
+            className="text-grey-500 ml-1
+          w-2/4
+            rounded border-2
+            border-solid bg-blue-50 py-2
             px-6 text-sm
             font-medium text-blue-700
             hover:cursor-pointer hover:bg-amber-50
             hover:text-amber-700"
           />
         </div>
-        <div className="flex justify-center p-5">{imageSrc && <img className="max-w-xs rounded" src={imageSrc.toString()} alt="" />}</div>
+        <div className="flex justify-center p-5">
+          {imageSrc && (
+            <img
+              className="max-w-xs rounded"
+              src={imageSrc.toString()}
+              alt=""
+            />
+          )}
+        </div>
         <input
           onChange={(e) => handleOnChange(e)}
           className="absolute -left-[9999rem]"
